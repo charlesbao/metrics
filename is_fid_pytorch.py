@@ -91,8 +91,10 @@ from torch.nn import functional as F
 import torch.utils.data
 from torchvision.models.inception import inception_v3
 
+from PIL import Image
 from scipy.stats import entropy
 import scipy.misc
+import imageio
 from scipy import linalg
 import numpy as np
 from tqdm import tqdm
@@ -273,6 +275,7 @@ class ScoreModel:
                 # scores is a list with len(scores) = n_img = preds.shape[0]
         """
 
+
         n_img = imgs_nchw.shape[0]
 
         assert batch_size > 0
@@ -376,8 +379,8 @@ if __name__ == '__main__':
         img_list = []
         print('Reading Images from %s ...' % foldername)
         for file in tqdm(files):
-            img = scipy.misc.imread(file, mode='RGB')
-            img = scipy.misc.imresize(img, (299, 299), interp='bilinear')
+            img = imageio.imread(file)
+            img = np.array(Image.fromarray(img).resize((299,299)))
             img = np.cast[np.float32]((-128 + img) / 128.)  # 0~255 -> -1~1
             img = np.expand_dims(img, axis=0).transpose(0, 3, 1, 2)  # NHWC -> NCHW
             img_list.append(img)
